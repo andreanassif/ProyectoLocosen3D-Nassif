@@ -1,9 +1,12 @@
-import fs from "fs"
+import fs, { fdatasync } from "fs"
+import path from "path"
+import url from "url"
 
-class contenedorMsj {
-    constructor (data){
-        this.data = data
-        this.object = this.readData(this.data)  || [];
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+export class contenedorMsj {
+    constructor (filename){
+        this.filename = path.join(__dirname,"..",`/files/${filename}`)
     }
     
     async getAll(){
@@ -17,30 +20,36 @@ class contenedorMsj {
 
     async save(obj){
         try{
-            const data = await this.getAll()
-            const newId = data[data.length-1].id +1;
-            const newMsj = {
-                id:newId,
-                autor:{id:obj.id,nombre:obj.nombre,edad:obj.edad,alias:obj.alias,avatar:obj.avatar},
-                texto:obj.texto,
-                hora:obj.hora
+            if(fs.existsSync(this.filename)){
+                const messages = await this.getAll();
+                if(messages.length>0){
+                    const newId = messages[messages.length-1].id + 1;
+                    const newMsj = {
+                        id: newId,
+                        ...obj,
+                    };
+                    messages.push(newMsj);
+                    console.log("messages", messages)
+                    await fs.promises.writeFile(this.filename, JSON.stringify(messages,null,2));
+
+                } else {
+                    const newMsj = {
+                        id: 1,
+                        ...obj,
+                    };
+                    await fs.promises.writeFile(this.filename,JSON.stringify([newMsj],null,2));
+                }
+            } else {
+                const newMsj = {
+                    id:1,
+                    ...obj
+                }
+                await fs.promises.writeFile(this.filename,JSON.stringify([newMsj],null,2));
+
             }
-            data.push(newMsj)
-            this.reWriteData(data)
-            return data
-        } catch(err){
-            console.log(err);
-        }
+        
 
-    }    
-    
-    readData(path){
-        const obj = JSON.parse(fs.readFileSync(path,'utf-8'))
-        return obj
-    }
-     reWriteData(object){
-        fs.writeFileSync(this.data,JSON.stringify(object,null,2))
-    }
-}
-
-export {contenedorMsj};
+    } catch (error) {
+        return "no se pudo guardar el mensaje"
+    } 
+}  }    

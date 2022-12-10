@@ -4,6 +4,7 @@ import router from "./router/route.js";
 import handlebars from "express-handlebars";
 import { Server } from "socket.io";
 import path from "path";
+import url from "url";
 import { fileURLToPath } from "url";
 import {dirname} from "path";
 import {contenedorMsj} from "./managers/contenedorMsj.js"
@@ -19,6 +20,7 @@ import MongoStore from 'connect-mongo';
 import { UserModel } from './models/user.js';
 
 const mensajes = new contenedorMsj(options.fileSystem.pathMensajes)
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -77,7 +79,11 @@ const normalizarMsj = async()=>{
     
     return mensajesNormalizados
 }
-normalizarMsj()
+
+// defino rutas
+
+app.use('/api', router);
+
 
 //Cookies
 app.use(cookieParser())
@@ -206,9 +212,7 @@ app.get('/api/logout',(req,res)=>{
     },3000)
 })
 
-// defino rutas
 
-app.use('/api', router);
 
 //configuro el puerto
 const PORT = process.env.PORT|| 8081
