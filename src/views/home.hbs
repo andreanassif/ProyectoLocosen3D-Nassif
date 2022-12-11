@@ -1,1 +1,33 @@
-<h2 class="mx-5 my-2">Locos en 3D</h2>
+<h2 class="mx-5 my-2" href="/" >Locos en 3D</h2>
+
+<div class="mx-5 my-2">
+    {{#if user}}
+
+
+
+        <div class="container mt-4" >
+        {{!-- <div class="card" style="width: 18rem;">            
+            <div class="card-header">Login Form</div>    
+            <div class="card-body"> --}}
+                <form action="/logout" method="POST">
+                    <div class="alert alert-info alert-dismissible fade show">
+                        <strong>Bienvenido {{user}}</strong>
+                        <button type="cerrar Sesión" class="btn btn-primary">Cerrar Sesión</button>
+                    </div>
+                    
+                </form>
+            {{!-- </div>
+        </div>
+    </div> --}}
+    {{/if}}
+    <p id="userEmail"></p>
+    {{> productsForm}}
+    <div class="my-4" id="productsContainer"></div>
+    <h2 class="text-primary">Centro de mensajes</h2>
+    <div id="compression"></div>
+    <input class="form-control my-2" type="text" id="chatMsj" placeholder="Ingresa un mensaje"/>
+    <button class="btn btn-primary mb-2" id="sendMsj">Enviar</button>
+    <div id="chatContainer" class="my-2"></div>
+</div>
+{{> importScripts}}
+<script src="index.js"></script>
