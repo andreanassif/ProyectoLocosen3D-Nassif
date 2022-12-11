@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
@@ -26,4 +27,7 @@ export const options = {
     fileSystem:{
         pathMensajes: path.join(__dirname , "../DB/mensajesChat.txt")
     }
+
+    
+    
 }

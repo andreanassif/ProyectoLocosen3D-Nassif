@@ -17,7 +17,8 @@ const mensajes = new contenedorMsj(options.fileSystem.pathMensajes)
 
 
 router.get('/', async(req,res)=>{
-    res.render('form')
+    res.render("/home")
+    
 })
 
 router.get('/productos', async (req,res)=>{
@@ -98,6 +99,8 @@ router.post('/chat', async (req,res)=>{
 router.get('/productos-test', async(req,res)=>{
     res.send(productosTest)
 })
+
+
 
 
 

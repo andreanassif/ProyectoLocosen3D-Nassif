@@ -1,22 +1,25 @@
 //importaciones
 import express from "express"; 
+import cookieParser from 'cookie-parser';
+import session from "express-session"; 
+import MongoStore from 'connect-mongo';
+import { options } from './config/configSql.js';
 import router from "./router/route.js";
 import handlebars from "express-handlebars";
 import { Server } from "socket.io";
+import { normalize, schema, denormalize} from "normalizr";
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import bcrypt from 'bcrypt';
+import mongoose from 'mongoose';
+
+
+
 import path from "path";
 import url from "url";
 import { fileURLToPath } from "url";
 import {dirname} from "path";
 import {contenedorMsj} from "./managers/contenedorMsj.js"
-import { options } from './config/configSql.js';
-import { normalize, schema } from "normalizr";
-import session from "express-session"; 
-import cookieParser from 'cookie-parser';
-import passport from 'passport';
-import { Strategy as LocalStrategy } from 'passport-local';
-import bcrypt from 'bcrypt';
-import mongoose from 'mongoose';
-import MongoStore from 'connect-mongo';
 import { UserModel } from './models/user.js';
 
 const mensajes = new contenedorMsj(options.fileSystem.pathMensajes)
@@ -105,17 +108,29 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
-//serializar
+//serializar usuario
 passport.serializeUser((user,done)=>{
     done(null, user.id)
 })
 
+//deserializar usuario
 passport.deserializeUser((id, done)=>{
     UserModel.findById(id,(error, userFound)=>{
         if(error) return done(error)
         return done(null,userFound)
     })
 })
+
+//middleware p/validar sesion
+
+const checkSession = (req,res,next) => {
+    //validamos si la sesion esta activa
+    if(req.session.user){
+        res.redirect("/perfil");
+    }else{
+        next()
+    }
+}
 
 //crear una funcion para encriptar la contraseñas;
 const createHash = (password)=>{
@@ -169,48 +184,6 @@ passport.use('loginStrategy', new LocalStrategy(
     }
 ));
 
-app.get('/api/registro', async(req,res)=>{
-    const errorMessage = req.session.messages ? req.session.messages[0] : '';
-    console.log(req.session);
-    res.render('signup',{error:errorMessage})
-    req.session.messages =[]
-})
-
-app.get('/api/inicio-sesion', (req,res)=>{
-    res.render('login')
-})
-
-app.post('/api/signup',passport.authenticate('signupStrategy',{
-    failureRedirect:'/api/registro',
-    failureMessage:true
-}),(req,res)=>{
-    res.redirect('/api/perfil')
-})
-
-app.post('/api/login',passport.authenticate('loginStrategy',{
-    failureRedirect: '/api/inicio-sesion',
-    failureMessage:true
-}),
-(req,res)=>{
-    res.redirect('/api/perfil')
-})
-
-
-app.get('/api/perfil',async(req,res)=>{
-    if(req.isAuthenticated()){
-        let {name} = req.user
-        res.render('form',{user:name})
-    }else{
-        res.send("<div>Debes <a href='/api/inicio-sesion'>inciar sesion</a> o <a href='/api/registro'>registrarte</a></div>")
-    }
-})
-
-app.get('/api/logout',(req,res)=>{
-    req.session.destroy()
-    setTimeout(()=>{
-            res.redirect('./inicio-sesion')
-    },3000)
-})
 
 
 
@@ -241,5 +214,63 @@ io.on('connection', async(socket)=>{
     })
 })
 
+//rutas del sitio web
+
+app.get("/", (req,res)=>{
+    res.render("home")
+})
+
+app.get("/signup", checkSession,(req,res)=>{
+    res.render("signup")
+});
+
+app.get("/login", checkSession, (req,res)=>{
+    res.render("login")
+})
+
+
+app.get("/profile",(req,res)=>{
+    if(req.session.user){
+        res.render("profile");
+    } else{
+        res.send("<div>Debes <a href'/login'>inciar sesion</a> o <a href='/signup'>registrarte</a></div>")
+    }
+});
+
+let users = [];
+
+//rutas de autenticacion
+
+app.post("/signup",passport.authenticate('signupStrategy',{
+    failureRedirect:"/signup",
+    failureMessage:true
+}),(req,res)=>{
+    res.redirect("/profile")
+})
+
+app.post("/login",passport.authenticate('loginStrategy',{
+    failureRedirect: "/login",
+    failureMessage:true
+}),
+(req,res)=>{
+    res.redirect("/profile")
+})
+
+
+app.get("/profile",async(req,res)=>{
+    if(req.isAuthenticated()){
+        let {name} = req.user
+        res.render("form",{user:name})
+    }else{
+        res.send("<div>Debes <a href='/login'>inciar sesion</a> o <a href='/signup'>registrarte</a></div>")
+    }
+})
+
+app.get("/logout",(req,res)=>{
+    req.session.destroy()
+    setTimeout(()=>{
+            res.redirect("/login")
+    },3000)
+})
 
 
