@@ -29,7 +29,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 //Conecto base de datis
-const mongoUrl = "mongodb+srv://nassif:benicio2022@locosen3d.4crkgqb.mongodb.net/authDB?retryWrites=true&w=majority"
+const mongoUrl = "mongodb+srv://nassif:Benicio2022@locosen3d.4crkgqb.mongodb.net/AuthDB?retryWrites=true&w=majority"
 
 mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
@@ -48,13 +48,13 @@ app.use(express.static(path.join(__dirname,'/views')))
 
 
 //motor plantilla
-app.engine('handlebars', handlebars.engine())
+app.engine(".hbs", handlebars.engine({extname: '.hbs'}))
 
 // defino directorio
-app.set('views',path.join(__dirname,'/views'))
+app.set("views", path.join(__dirname,"/views"))
 
 //defino motor express
-app.set('view engine', 'handlebars')
+app.set("view engine", ".hbs")
 
 //normalizacion de datos
 
