@@ -1,4 +1,4 @@
-console.log('conectado');
+console.log('socket conectado');
 
 const socketCliente = io();
 

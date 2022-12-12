@@ -29,9 +29,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 //Conecto base de datis
-const mongoUrl = "mongodb+srv://nassif:Benicio2022@locosen3d.4crkgqb.mongodb.net/AuthDB?retryWrites=true&w=majority"
+const mongoUrl = "mongodb+srv://nassif:benicio2022@locosen3d.4crkgqb.mongodb.net/AuthDB?retryWrites=true&w=majority"
 
-mongoose.connect(mongoUrl, {
+mongoose.createConnection(mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology:true
 }, (err)=>{
@@ -105,8 +105,8 @@ app.use(session({
 
 // Configuro passport
 
-app.use(passport.initialize())
-app.use(passport.session())
+app.use(passport.initialize()) //conecto passport con express
+app.use(passport.session()) //vinculo passport y sesiones de usuarios
 
 //serializar usuario
 passport.serializeUser((user,done)=>{
@@ -123,14 +123,14 @@ passport.deserializeUser((id, done)=>{
 
 //middleware p/validar sesion
 
-const checkSession = (req,res,next) => {
-    //validamos si la sesion esta activa
-    if(req.session.user){
-        res.redirect("/perfil");
-    }else{
-        next()
-    }
-}
+//const checkSession = (req,res,next) => {
+//    //validamos si la sesion esta activa
+//    if(req.session.user){
+//        res.redirect("/perfil");
+//    }else{
+//        next()
+//    }
+//}
 
 //crear una funcion para encriptar la contraseñas;
 const createHash = (password)=>{
@@ -150,6 +150,7 @@ passport.use('signupStrategy', new LocalStrategy({
     (req,username,password,done)=>{
         console.log(username);
         UserModel.findOne({username:username}, (error,userFound)=>{
+            console.log(userFound)
             if (error) return done(error,null,{message:'hubo un error'})
             if(userFound) return done(null,null,{message:'el usuario existe'}) 
             const newUser = {
@@ -182,6 +183,8 @@ passport.use('loginStrategy', new LocalStrategy(
             return done(null, user);
         });
     }
+    
+
 ));
 
 
@@ -220,11 +223,12 @@ app.get("/", (req,res)=>{
     res.render("home")
 })
 
-app.get("/signup", checkSession,(req,res)=>{
-    res.render("signup")
+app.get("/signup",(req,res)=>{
+    const errorMessage = req.session.message ? req.session.message[0] : '';
+    res.render("signup", {error: errorMessage})
 });
 
-app.get("/login", checkSession, (req,res)=>{
+app.get("/login", (req,res)=>{
     res.render("login")
 })
 
@@ -237,7 +241,7 @@ app.get("/profile",(req,res)=>{
     }
 });
 
-let users = [];
+//let users = [];
 
 //rutas de autenticacion
 
