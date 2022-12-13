@@ -29,7 +29,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 //Conecto base de datis
-const mongoUrl = "mongodb+srv://nassif:benicio2022@locosen3d.4crkgqb.mongodb.net/AuthDB?retryWrites=true&w=majority"
+const mongoUrl = "mongodb+srv://nassif:q4u1Xu8iC3xWXQKD@locosen3d.4crkgqb.mongodb.net/authDB?retryWrites=true&w=majority"
 
 mongoose.createConnection(mongoUrl, {
     useNewUrlParser: true,
@@ -44,8 +44,8 @@ mongoose.createConnection(mongoUrl, {
 const app = express()
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
-app.use(express.static(path.join(__dirname,'/views')))
-
+//app.use(express.static(path.join(__dirname,'/views')))
+app.use(express.static('public'))
 
 //motor plantilla
 app.engine(".hbs", handlebars.engine({extname: '.hbs'}))
@@ -93,14 +93,14 @@ app.use(cookieParser())
 
 app.use(session({
     store: MongoStore.create({
-        mongoUrl:"mongodb+srv://nassif:benicio2022@locosen3d.4crkgqb.mongodb.net/sessionDB?retryWrites=true&w=majority"
+        mongoUrl:"mongodb+srv://nassif:q4u1Xu8iC3xWXQKD@locosen3d.4crkgqb.mongodb.net/sessionDB?retryWrites=true&w=majority"
     }),
     secret:"claveSecreta",
     resave:false,
     saveUninitialized:false,
-    cookie:{
+    /* cookie:{
         maxAge:600000
-    }
+    } */
 }))
 
 // Configuro passport
@@ -115,9 +115,8 @@ passport.serializeUser((user,done)=>{
 
 //deserializar usuario
 passport.deserializeUser((id, done)=>{
-    UserModel.findById(id,(error, userFound)=>{
-        if(error) return done(error)
-        return done(null,userFound)
+    UserModel.findById(id,(err, userFound)=>{
+        return done(err,userFound)
     })
 })
 
@@ -137,20 +136,22 @@ const createHash = (password)=>{
     const hash = bcrypt.hashSync(password,bcrypt.genSaltSync(10));
     return hash;
 }
+
 //Validar contraseña
 const isValidPassword = (user, password)=>{
     return bcrypt.compareSync(password, user.password);
 }
 
-//passport strategy crear usuario
-passport.use('signupStrategy', new LocalStrategy({
-    passReqToCallback:true,
-    usernameField: "email",
-},
+//passport local strategy crear usuario
+passport.use('signupStrategy', new LocalStrategy(
+    {
+        passReqToCallback:true,
+        usernameField: "email",
+    },
     (req,username,password,done)=>{
-        console.log(username);
+        
         UserModel.findOne({username:username}, (error,userFound)=>{
-            console.log(userFound)
+            
             if (error) return done(error,null,{message:'hubo un error'})
             if(userFound) return done(null,null,{message:'el usuario existe'}) 
             const newUser = {
@@ -168,12 +169,12 @@ passport.use('signupStrategy', new LocalStrategy({
 ))
 
 // passport strategy iniciar sesion
-passport.use('loginStrategy', new LocalStrategy(
+/* passport.use('loginStrategy', new LocalStrategy(
     (username, password, done) => {
-        console.log(username);
+        //console.log(username);
         UserModel.findOne({ username: username }, (err, user)=> {
-            console.log(user);
-            if (err) return done(err);
+            //console.log(user);
+            if (err) return done(err, null, {message: "Hubo un error en el logueo"});
             if (!user) return done(null, false);
             if (!user.password) return done(null, false);
             if (!isValidPassword(user,password)){
@@ -186,7 +187,7 @@ passport.use('loginStrategy', new LocalStrategy(
     
 
 ));
-
+ */
 
 
 
@@ -224,8 +225,9 @@ app.get("/", (req,res)=>{
 })
 
 app.get("/signup",(req,res)=>{
-    const errorMessage = req.session.message ? req.session.message[0] : '';
+    const errorMessage = req.session.messages ? req.session.messages[0] : '';
     res.render("signup", {error: errorMessage})
+    req.session.messages = []
 });
 
 app.get("/login", (req,res)=>{
@@ -234,10 +236,11 @@ app.get("/login", (req,res)=>{
 
 
 app.get("/profile",(req,res)=>{
-    if(req.session.user){
+    console.log(req.session)
+    if(req.isAuthenticated()){
         res.render("profile");
     } else{
-        res.send("<div>Debes <a href'/login'>inciar sesion</a> o <a href='/signup'>registrarte</a></div>")
+        res.send("<div>Debes <a href='/login'>inciar sesion</a> o <a href='/signup'>registrarte</a></div>")
     }
 });
 
@@ -245,20 +248,38 @@ app.get("/profile",(req,res)=>{
 
 //rutas de autenticacion
 
-app.post("/signup",passport.authenticate('signupStrategy',{
-    failureRedirect:"/signup",
-    failureMessage:true
-}),(req,res)=>{
-    res.redirect("/profile")
-})
+app.post("/login",(req,res)=>{
+    const user = req.body;
+    //el usuario existe
+    const userExists = users.find(elm=>elm.email === user.email);
+    if(userExists){
+        //validar la contrase;a
+        if(userExists.password === user.password){
+            req.session.user = user;
+            res.redirect("/profile")
+        } else{
+            res.redirect("/login")
+        }
+    } else{
+        res.redirect("/signup");
+    }
+});
 
-app.post("/login",passport.authenticate('loginStrategy',{
+/* app.post("/login",passport.authenticate('loginStrategy',{
     failureRedirect: "/login",
     failureMessage:true
 }),
 (req,res)=>{
     res.redirect("/profile")
-})
+}) */
+
+app.post("/signup",passport.authenticate('signupStrategy',{
+    failureRedirect:"/signup",
+    failureMessage:true //req.session.messages
+}),(req,res)=>{
+    res.redirect("/profile")
+});
+
 
 
 app.get("/profile",async(req,res)=>{
@@ -271,10 +292,10 @@ app.get("/profile",async(req,res)=>{
 })
 
 app.get("/logout",(req,res)=>{
-    req.session.destroy()
-    setTimeout(()=>{
-            res.redirect("/login")
-    },3000)
-})
-
+    req.logout(err=>{
+        if(err) return res.send("hubo un error al cerrar sesion")
+        req.session.destroy();
+        res.redirect("/")
+    });
+});
 

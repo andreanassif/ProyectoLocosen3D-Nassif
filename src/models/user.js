@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 const usersCollection = 'users'
 
-mongoose.set('strictQuery', true)
+//mongoose.set('strictQuery', true)
 
 const userSchema = new mongoose.Schema({
     name:String,

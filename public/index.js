@@ -53,7 +53,7 @@ const msjSchema = new normalizr.schema.Entity('mensajes',{autor:autorSchema})
 const chatSchema = new normalizr.schema.Entity('chat',{
     mensajes:[msjSchema]
 },{idAttribute:'id'})
-Swal.fire({
+/* Swal.fire({
     title: 'Bienvenido/a',
     text:'Ingrese su Email',
     html: `<input type="text" id="email" class="swal2-input" placeholder="Correo" required>
@@ -94,7 +94,7 @@ if(msj){
             hora: new Date()
         })
         msj.value=''
-    })
+    }) 
     
     //recibe los msj
     socketCliente.on('chat', async (data)=>{
@@ -107,4 +107,6 @@ if(msj){
         });
         chatHistorico.innerHTML = elemento
     })
-}
+}*/
+
+

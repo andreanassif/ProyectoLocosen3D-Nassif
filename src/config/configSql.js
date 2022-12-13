@@ -26,8 +26,10 @@ export const options = {
     },
     fileSystem:{
         pathMensajes: path.join(__dirname , "../DB/mensajesChat.txt")
-    }
+    },
 
-    
+    mongoose: {
+
+    }
     
 }
