@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import path from 'path';
 import {fileURLToPath} from 'url';
+import {config} from "./config.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,7 +11,7 @@ export const options = {
     mariaDb:{
         client:'mysql',
         connection:{
-            host: '127.0.0.1',
+            host: config.MARIADB_HOST,
             user: 'root',
             password:'',
             database:'ecommerce'
@@ -19,13 +20,13 @@ export const options = {
     sqlite: {
         client:"sqlite",
         connection:{
-            filename:path.join(__dirname, "../DB/chatDB.sqlite")
+            filename:path.join(__dirname, config.SQLITE_DB)
             
         },
         useNullAsDefault: true
     },
     fileSystem:{
-        pathMensajes: path.join(__dirname , "../DB/mensajesChat.txt")
+        pathMensajes: path.join(__dirname , config.FILE_DB)
     },
 
     mongoose: {

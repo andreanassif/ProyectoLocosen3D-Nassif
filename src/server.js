@@ -21,6 +21,7 @@ import { fileURLToPath } from "url";
 import {dirname} from "path";
 import {contenedorMsj} from "./managers/contenedorMsj.js"
 import { UserModel } from './models/user.js';
+import {config} from "./config/config.js"
 
 const mensajes = new contenedorMsj(options.fileSystem.pathMensajes)
 
@@ -29,7 +30,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 //Conecto base de datis
-const mongoUrl = "mongodb+srv://nassif:q4u1Xu8iC3xWXQKD@locosen3d.4crkgqb.mongodb.net/authDB?retryWrites=true&w=majority"
+const mongoUrl = config.MONGO_AUTENTICATION 
 
 mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
@@ -93,7 +94,7 @@ app.use(cookieParser())
 
 app.use(session({
     store: MongoStore.create({
-        mongoUrl:"mongodb+srv://nassif:q4u1Xu8iC3xWXQKD@locosen3d.4crkgqb.mongodb.net/sessionDB?retryWrites=true&w=majority"
+        mongoUrl: config.MONGO_SESSION
     }),
     secret:"claveSecreta",
     resave:false,
