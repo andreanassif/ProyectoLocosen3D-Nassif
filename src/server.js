@@ -31,7 +31,7 @@ const __dirname = path.dirname(__filename);
 //Conecto base de datis
 const mongoUrl = "mongodb+srv://nassif:q4u1Xu8iC3xWXQKD@locosen3d.4crkgqb.mongodb.net/authDB?retryWrites=true&w=majority"
 
-mongoose.createConnection(mongoUrl, {
+mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology:true
 }, (err)=>{
@@ -98,9 +98,9 @@ app.use(session({
     secret:"claveSecreta",
     resave:false,
     saveUninitialized:false,
-    /* cookie:{
+    cookie:{
         maxAge:600000
-    } */
+    }
 }))
 
 // Configuro passport
@@ -138,9 +138,9 @@ const createHash = (password)=>{
 }
 
 //Validar contraseña
-const isValidPassword = (user, password)=>{
-    return bcrypt.compareSync(password, user.password);
-}
+//const isValidPassword = (user, password)=>{
+//    return bcrypt.compareSync(password, user.password);
+//}
 
 //passport local strategy crear usuario
 passport.use('signupStrategy', new LocalStrategy(
@@ -169,7 +169,7 @@ passport.use('signupStrategy', new LocalStrategy(
 ))
 
 // passport strategy iniciar sesion
-/* passport.use('loginStrategy', new LocalStrategy(
+passport.use('loginStrategy', new LocalStrategy(
     (username, password, done) => {
         //console.log(username);
         UserModel.findOne({ username: username }, (err, user)=> {
@@ -187,7 +187,7 @@ passport.use('signupStrategy', new LocalStrategy(
     
 
 ));
- */
+
 
 
 
@@ -248,30 +248,29 @@ app.get("/profile",(req,res)=>{
 
 //rutas de autenticacion
 
-app.post("/login",(req,res)=>{
-    const user = req.body;
-    //el usuario existe
-    const userExists = users.find(elm=>elm.email === user.email);
-    if(userExists){
-        //validar la contrase;a
-        if(userExists.password === user.password){
-            req.session.user = user;
-            res.redirect("/profile")
-        } else{
-            res.redirect("/login")
-        }
-    } else{
-        res.redirect("/signup");
-    }
-});
+//app.post("/login",(req,res)=>{
+//    const users = req.body;
+//    //el usuario existe
+//    const userExists = users.find(elm=>elm.email === users.email);
+//    if(userExists){
+//        //validar la contraseña
+//        if(userExists.password === user.password){
+//            req.session.user = user;
+//            res.redirect("/profile")
+//        } else{
+//            res.redirect("/login")
+//        }
+//    } else{
+//        res.redirect("/signup");
+//    }
+//});
 
-/* app.post("/login",passport.authenticate('loginStrategy',{
-    failureRedirect: "/login",
+app.post("/login",passport.authenticate('loginStrategy',{
+    failureRedirect: "/profile",
     failureMessage:true
-}),
-(req,res)=>{
+}),(req,res)=>{
     res.redirect("/profile")
-}) */
+})
 
 app.post("/signup",passport.authenticate('signupStrategy',{
     failureRedirect:"/signup",
