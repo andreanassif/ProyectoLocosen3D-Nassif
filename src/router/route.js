@@ -9,8 +9,6 @@ import { Strategy as LocalStrategy } from 'passport-local'
 import bcrypt from 'bcrypt'
 import session, { Cookie } from 'express-session'
 import { UserModel } from '../models/user.js'
-import os from "os"
-import {config} from '../config/config.js'
 
 
 
@@ -21,15 +19,7 @@ const productos = new ContendorMariaDb(options.mariaDb,'productos')
 const mensajes = new contenedorMsj(options.fileSystem.pathMensajes)
 
 
-let argumentosEntrada = process.argv
-let pathEjecucion = process.execPath
-let sistemaOperativo = process.platform
-let processId = process.pid
-let nodeVersion = process.version
-let carpetaProyecto = process.cwd()
-let usoMemoria = process.memoryUsage();
-export let numeroCPUs = os.cpus().length
-const PORT = config.PORT
+
 
 
 router.get('/', async(req,res)=>{
@@ -116,31 +106,7 @@ router.get('/productos-test', async(req,res)=>{
     res.send(productosTest)
 })
 
-//desafio 14 
-router.get('/info', async(req,res)=>{
-    
-    res.json({
-        message: `Respuesta desde el puerto ${PORT} en el proceso ${process.pid}`,
-        response: 
-            argumentosEntrada, //- Argumentos de entrada 
-            pathEjecucion, //- Path de ejecución
-            processId, //- Process id
-            sistemaOperativo, //- Nombre de la plataforma (sistema operativo)
-            nodeVersion, //- Versión de node.js
-            carpetaProyecto, //- Carpeta del proyecto
-            usoMemoria,//- Memoria total reservada (rss)
-            numeroCPUs,
-    })
 
-})
-
-router.get('/random', async(req,res)=>{
-    
-    res.send()
-
-
-
-})
 
 
 

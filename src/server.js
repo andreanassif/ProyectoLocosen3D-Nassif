@@ -12,7 +12,10 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
-
+import os from "os"
+import {config} from './config/config.js'
+import { random } from "./managers/operations.js"
+import {fork} from "child_process"
 
 
 import path from "path";
@@ -21,7 +24,6 @@ import { fileURLToPath } from "url";
 import {dirname} from "path";
 import {contenedorMsj} from "./managers/contenedorMsj.js"
 import { UserModel } from './models/user.js';
-import {config} from "./config/config.js"
 
 const mensajes = new contenedorMsj(options.fileSystem.pathMensajes)
 
@@ -299,3 +301,40 @@ app.get("/logout",(req,res)=>{
     });
 });
 
+//------------------desafio 14----------------------------
+
+app.get("/info", (req,res)=>{
+    let argumentosEntrada = process.argv
+    let pathEjecucion = process.execPath
+    let sistemaOperativo = process.platform
+    let processId = process.pid
+    let nodeVersion = process.version
+    let carpetaProyecto = process.cwd()
+    let usoMemoria = process.memoryUsage();
+    let numeroCPUs = os.cpus().length
+    const PORT = config.PORT
+
+    res.json({
+        message: `Respuesta desde el puerto ${PORT} en el proceso ${process.pid}`,
+        response: 
+            argumentosEntrada, //- Argumentos de entrada 
+            pathEjecucion, //- Path de ejecución
+            processId, //- Process id
+            sistemaOperativo, //- Nombre de la plataforma (sistema operativo)
+            nodeVersion, //- Versión de node.js
+            carpetaProyecto, //- Carpeta del proyecto
+            usoMemoria,//- Memoria total reservada (rss)
+            numeroCPUs,
+    })
+})
+
+app.get("/random", (req,res)=>{
+    const child = fork("src/child.js");
+    const {cantidad} = req.query
+    
+    let obj = {};
+    cantidad
+            ? child.send({ cantidad, obj })
+            : child.send({ cantidad: 500000000, obj });
+            child.on('message', msg => res.json(msg))
+})
