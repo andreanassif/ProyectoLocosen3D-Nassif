@@ -1,12 +1,14 @@
 import * as dotenv from "dotenv";
 import parsedArgs from "minimist";
 
+
 dotenv.config();
 
 // Llama librería minimist y definir variables defaul
-const options = {default: {puerto:8081, modo: "fork"}}
+const options = {alias:{m: "modo", p: "puerto"},  default: {puerto: 8081, modo: "FORK"}}
 
 const objArguments = parsedArgs(process.argv.slice(2), options)
+console.log("objArguments",objArguments)
 
 //creamos la configuracion de nuestra aplicacion
 
@@ -19,3 +21,4 @@ export const config = {
     MONGO_AUTENTICATION:process.env.MONGO_AUTENTICATION,
     MONGO_SESSION:process.env.MONGO_SESSION
 };
+

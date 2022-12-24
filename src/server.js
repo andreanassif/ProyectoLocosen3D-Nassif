@@ -16,6 +16,7 @@ import os from "os"
 import {config} from './config/config.js'
 import { random } from "./managers/operations.js"
 import {fork} from "child_process"
+import cluster from "cluster"
 
 
 import path from "path";
@@ -30,6 +31,8 @@ const mensajes = new contenedorMsj(options.fileSystem.pathMensajes)
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+
 
 //Conecto base de datis
 const mongoUrl = config.MONGO_AUTENTICATION 
@@ -195,31 +198,48 @@ passport.use('loginStrategy', new LocalStrategy(
 
 
 //configuro el puerto
-const PORT = process.env.PORT|| 8081
+const MODO = config.MODO
 
-const server = app.listen(PORT,()=>console.log(`server ${PORT}`))
-
-const io = new Server(server);
-
-io.on('connection', async(socket)=>{
-    //console.log('nuevo usuario', socket.id)
-
-    //io.sockets.emit('productos', productos);
-	io.sockets.emit('chat', await normalizarMsj());
-
-    socket.broadcast.emit('nuevoUsuario')
-
-    /*socket.on('nuevoProducto', nuevoProducto=>{
-        productos.push(nuevoProducto)
-        fs.writeFileSync('./archivo.txt', JSON.stringify(productos))
-        io.sockets.emit('lista', productos)
-    })*/
-
-    socket.on('nuevoMsj', async (nuevoMsj) =>{
-        await mensajes.save(nuevoMsj)
-        io.sockets.emit('chat', await normalizarMsj())
+if(MODO === "CLUSTER" && cluster.isPrimary){
+    console.log("modo cluster")
+    const numeroCPUs = os.cpus().length
+     for(let i=0; i<numeroCPUs; i++){
+        cluster.fork() //creacion de subprocesos
+    }
+    cluster.on("exit", (worker)=>{
+        console.log(`El subproceso ${worker.process.pid} falló`)
+        cluster.fork()
+    })  
+} else {
+    const PORT = config.PORT
+    const server = app.listen(PORT,()=>console.log(`server ${PORT} process${process.pid} `))
+    
+    
+    
+    const io = new Server(server);
+    
+    io.on('connection', async(socket)=>{
+        //console.log('nuevo usuario', socket.id)
+    
+        //io.sockets.emit('productos', productos);
+        io.sockets.emit('chat', await normalizarMsj());
+    
+        socket.broadcast.emit('nuevoUsuario')
+    
+        /*socket.on('nuevoProducto', nuevoProducto=>{
+            productos.push(nuevoProducto)
+            fs.writeFileSync('./archivo.txt', JSON.stringify(productos))
+            io.sockets.emit('lista', productos)
+        })*/
+    
+        socket.on('nuevoMsj', async (nuevoMsj) =>{
+            await mensajes.save(nuevoMsj)
+            io.sockets.emit('chat', await normalizarMsj())
+        })
     })
-})
+}
+
+
 
 //rutas del sitio web
 
