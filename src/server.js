@@ -17,6 +17,8 @@ import {config} from './config/config.js'
 import { random } from "./managers/operations.js"
 import {fork} from "child_process"
 import cluster from "cluster"
+import compression from "compression"
+
 
 
 import path from "path";
@@ -347,6 +349,35 @@ app.get("/info", (req,res)=>{
             numeroCPUs,
     })
 })
+
+//--------desafio 16-----------------------
+
+app.get("/infoZip", compression(), (req,res)=>{
+    let argumentosEntrada = process.argv
+    let pathEjecucion = process.execPath
+    let sistemaOperativo = process.platform
+    let processId = process.pid
+    let nodeVersion = process.version
+    let carpetaProyecto = process.cwd()
+    let usoMemoria = process.memoryUsage();
+    let numeroCPUs = os.cpus().length
+    const PORT = config.PORT
+
+    res.json({
+        message: `Respuesta desde el puerto ${PORT} en el proceso ${process.pid}`,
+        response: 
+            argumentosEntrada, //- Argumentos de entrada 
+            pathEjecucion, //- Path de ejecución
+            processId, //- Process id
+            sistemaOperativo, //- Nombre de la plataforma (sistema operativo)
+            nodeVersion, //- Versión de node.js
+            carpetaProyecto, //- Carpeta del proyecto
+            usoMemoria,//- Memoria total reservada (rss)
+            numeroCPUs,
+    })
+})
+//-----------------------------------
+
 
 app.get("/random", (req,res)=>{
     const child = fork("src/child.js");
