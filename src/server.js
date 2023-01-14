@@ -64,6 +64,14 @@ app.set("views", path.join(__dirname,"/views"))
 //defino motor express
 app.set("view engine", ".hbs")
 
+
+
+const PORT = process.env.PORT || 8080;
+app.listen(PORT,()=>console.log(`Server listening on port ${PORT}`));
+
+
+
+
 //normalizacion de datos
 
 //autor

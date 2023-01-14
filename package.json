@@ -17,9 +17,7 @@
     "artillery-fork": "artillery quick --count 20 -n 50 http://localhost:8081?max=100000 > result_fork.txt",
     "artillery-cluster": "artillery quick --count 20 -n 50 http://localhost:8081?max=100000 > result_cluster.txt",
     "artillery-fork-sinchild": "artillery quick --count 20 -n 50 http://localhost:8081?max=100000 > result_fork_sinchild.txt",
-    "artillery-cluster-sinchild": "artillery quick --count 20 -n 50 http://localhost:8081?max=100000 > result_cluster_sinchild.txt",
-    "artillery-isolate-cluster":"artillery quick --count 20 -n 50 http://localhost:8081?max=100000 > result_prof_isolate_cluster.txt",
-    "artillery-isolate-fork":"artillery quick --count 20 -n 50 http://localhost:8081?max=100000 > result_prof_isolate_fork.txt"
+    "artillery-cluster-sinchild": "artillery quick --count 20 -n 50 http://localhost:8081?max=100000 > result_cluster_sinchild.txt"
   },
   "keywords": [],
   "author": "",
