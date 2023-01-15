@@ -37,11 +37,12 @@ const __dirname = path.dirname(__filename);
 
 
 //Conecto base de datis
-const mongoUrl = config.MONGO_AUTENTICATION 
+const mongoUrl = "mongodb+srv://nassif:q4u1Xu8iC3xWXQKD@locosen3d.4crkgqb.mongodb.net/authDB?retryWrites=true&w=majority" /* config.MONGO_AUTENTICATION */ 
 
 mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
-    useUnifiedTopology:true
+    useUnifiedTopology:true,
+    
 }, (err)=>{
     if(err) return console.log(`hubo un error: ${err}`);
     console.log('conexion a base de datos exitosa');
