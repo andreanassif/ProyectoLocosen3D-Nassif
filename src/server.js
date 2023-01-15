@@ -109,7 +109,7 @@ app.use(cookieParser())
 
 app.use(session({
     store: MongoStore.create({
-        mongoUrl: config.MONGO_SESSION
+        mongoUrl: "mongodb+srv://nassif:q4u1Xu8iC3xWXQKD@locosen3d.4crkgqb.mongodb.net/sessionDB?retryWrites=true&w=majority" /* config.MONGO_SESSION */
     }),
     secret:"claveSecreta",
     resave:false,
