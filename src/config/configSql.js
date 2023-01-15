@@ -20,13 +20,13 @@ export const options = {
     sqlite: {
         client:"sqlite",
         connection:{
-            filename:path.join(__dirname, './DB/chatDB.sqlite')
+            filename:path.join(__dirname, config.SQLITE_DB)
             
         },
         useNullAsDefault: true
     },
     fileSystem:{
-        pathMensajes: path.join(__dirname , './files/mensajesChat.txt')
+        pathMensajes: path.join(__dirname , config.FILE_DB)
     },
 
     mongoose: {
