@@ -223,7 +223,7 @@ if(MODO === "CLUSTER" && cluster.isPrimary){
     })  
 } else {
     const PORT = config.PORT
-    const server = app.listen(PORT,()=>console.log(`server ${PORT} process${process.pid} `))
+    const server = app.listen(8080,()=>console.log(`server ${PORT} process${process.pid} `))
     
     
     
