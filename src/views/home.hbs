@@ -1,4 +1,10 @@
-<h2 class="mx-5 my-2" href="/" >Locos en 3D</h2>
+<body style="background-color: black;">
+
+<header>
+    <link rel="icon" type="image/jpg" href="https://res.cloudinary.com/dhndpus6m/image/upload/v1674869704/Locosen3D/favicon_pswbm0.ico"/>
+</header>
+    
+<h2 class="mx-5 my-2" href="/" style="color: aquamarine;">Locos en 3D</h2>
 
 <div class="mx-5 my-2">
     {{#if user}}
@@ -22,12 +28,18 @@
     {{/if}}
     <p id="userEmail"></p>
     {{> productsForm}}
-    <div class="my-4" id="productsContainer"></div>
-    <h2 class="text-primary">Centro de mensajes</h2>
-    <div id="compression"></div>
+    <div class="my-4" id="productsContainer">
+
+    </div>
+    <h2 class="" style="color: aquamarine;">Centro de mensajes</h2>
+    <div id="compression">
+
+    </div>
     <input class="form-control my-2" type="text" id="chatMsj" placeholder="Ingresa un mensaje"/>
-    <button class="btn btn-primary mb-2" id="sendMsj">Enviar</button>
+    <button class="btn btn-success mb-2" id="sendMsj">Enviar</button>
     <div id="chatContainer" class="my-2"></div>
 </div>
 {{> importScripts}}
 <script src="index.js"></script>
+
+</body>

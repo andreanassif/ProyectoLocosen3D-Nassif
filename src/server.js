@@ -17,7 +17,8 @@ import {config} from './config/config.js'
 import { random } from "./managers/operations.js"
 import {fork} from "child_process"
 import cluster from "cluster"
-import compression from "compression"
+import compression from "compression";
+import {createTransport} from "nodemailer";
 
 
 
@@ -37,7 +38,7 @@ const __dirname = path.dirname(__filename);
 
 
 //Conecto base de datis
-const mongoUrl = "mongodb+srv://nassif:q4u1Xu8iC3xWXQKD@locosen3d.4crkgqb.mongodb.net/authDB?retryWrites=true&w=majority" /* config.MONGO_AUTENTICATION */ 
+const mongoUrl = config.MONGO_AUTENTICATION
 
 mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
@@ -110,7 +111,7 @@ app.use(cookieParser())
 
 app.use(session({
     store: MongoStore.create({
-        mongoUrl: "mongodb+srv://nassif:q4u1Xu8iC3xWXQKD@locosen3d.4crkgqb.mongodb.net/sessionDB?retryWrites=true&w=majority" /* config.MONGO_SESSION */
+        mongoUrl: config.MONGO_SESSION
     }),
     secret:"claveSecreta",
     resave:false,
@@ -274,7 +275,7 @@ app.get("/profile",(req,res)=>{
     if(req.isAuthenticated()){
         res.render("profile");
     } else{
-        res.send("<div>Debes <a href='/login'>inciar sesion</a> o <a href='/signup'>registrarte</a></div>")
+        res.send("<div>Debes <button class='btn btn-success'><a href='/login'>inciar sesion</a></button> o <button class='btn btn-success'><a href='/signup'>registrarte</a></button></div>")
     }
 });
 
@@ -397,4 +398,54 @@ app.get("/random", (req,res)=>{
             ? child.send({ cantidad, obj })
             : child.send({ cantidad: 500000000, obj });
             child.on('message', msg => res.json(msg))
+})
+
+//-------desafio  clase 18 3er entrega vista carrito---------------
+
+app.get("/cart", (req,res)=>{
+    res.render("cart")
+})
+
+/* app.get("/productos", (req,res)=>{
+    res.render("productos")
+    req.body()
+})
+ */
+
+//-----------desafio 18 3er entrega proyecto - Add Nodemailer con gmail y Twilio ----------------
+//variables externas
+const TEST_EMAIL = "andrea.e.nassif@gmail.com"; //modificamos credenciales de acceso
+const TEST_PASS = "cgwqpaspswplrgrs";
+//config ethereal 
+const transporter = createTransport({
+    host: 'smtp.gmail.com', //modificamos el host de gmail
+    port: 587,
+    auth: {
+        user: TEST_EMAIL,
+        pass: TEST_PASS
+    },
+    secure: false, //cuando se use tiene que estar en true
+    tls: {
+        rejectUnauthorized: false //cuando se use tiene que estar en true
+    }
+});
+
+const emailTemplate = `<div>
+<h1>Un nuevo usuario se ha registrado correctamente</h1>
+</div>`
+
+const mailOptions={
+    from: "Servidor de NodeJS",
+    to: TEST_EMAIL,
+    subject:"Nuevo Registro de Usuario",
+    html: emailTemplate
+}
+
+app.post("/signup", async(req,res)=>{
+    try{
+        const response = await transporter.sendMail(mailOptions)
+        res.send(`El msj fue enviado ${response}`)
+    } catch (error) {
+        res.send(error)
+    }
 })

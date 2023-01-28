@@ -1,0 +1,14 @@
+<body style="background-color: black;">
+<h2 href="/productos" >Productos</h2>    
+<div class="d-flex row">
+    {{#each productos}}
+        <div class="card" style="width: 18rem;">
+            <img src={{this.url}} class="card-img-top" alt="{{this.producto}}">
+            <div class="card-body">
+                <h5 class="card-title">{{this.producto}}</h5>
+                <button class="btn btn-primary agregarCarrito" id="{{this.id}}">Agregar al carrito</button>
+            </div>
+        </div>
+    {{/each}}
+</div>
+</body>

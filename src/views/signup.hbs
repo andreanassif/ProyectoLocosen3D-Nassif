@@ -1,4 +1,6 @@
-<h2 class="mx-5 my-2">Formulario de Registro</h2>
+<body style="background-color: black;">
+    
+<h2 class="mx-5 my-2" style="color: aquamarine;">Formulario de Registro</h2>
 <div class="mx-5 my-2">
     {{#if error}}
         <p>{{error}}</p>
@@ -10,8 +12,9 @@
         <input class="form-control" type="text" name="email" placeholder="Ingresa tu correo"/>
         <label>password:</label>
         <input class="form-control" type="password" name="password" placeholder="Ingresa la contraseña"/>
-        <button type="submit" class="btn btn-info my-3">Registrarse</button>
+        <button type="submit" class="btn btn-success my-3">Registrarse</button>
     </form>
     <hr>
-    <a href="/login">Si ya tienes una cuenta, inicia sesión aquí!</a>
+    <a href="/login" style="color: aquamarine;">Si ya tienes una cuenta, inicia sesión aquí!</a>
 </div>
+</body>
