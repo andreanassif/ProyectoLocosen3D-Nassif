@@ -310,13 +310,49 @@ app.post("/login",passport.authenticate('loginStrategy',{
     res.redirect("/profile")
 })
 
+//-----------desafio 18 3er entrega proyecto - Add Nodemailer con gmail y Twilio ----------------
+//variables externas
+const TEST_EMAIL = config.TEST_EMAIL; //modificamos credenciales de acceso
+const TEST_PASS = config.TEST_PASS;
+//config nodemailer transporter
+const transporter = createTransport({
+    host: 'smtp.gmail.com', //modificamos el host de gmail
+    port: 587,
+    auth: {
+        user: TEST_EMAIL,
+        pass: TEST_PASS
+    },
+    secure: false, //cuando se use tiene que estar en true
+    tls: {
+        rejectUnauthorized: false //cuando se use tiene que estar en true
+    }
+});
 
+const emailTemplate =`<div>
+<h1> Un nuevo usuario se ha registrado correctamente!</h1>
+</div>`
+
+const mailOptions={
+    from: "Servidor de NodeJS",
+    to: TEST_EMAIL,
+    subject:"Nuevo Registro de Usuario",
+    html: emailTemplate
+}
 
 app.post("/signup",passport.authenticate('signupStrategy',{
     failureRedirect:"/signup",
     failureMessage:true //req.session.messages
-}), (req,res)=>{
-    res.redirect("/profile")
+}), async(req,res)=>{
+    try{
+       
+        const response = await transporter.sendMail(mailOptions);
+        console.log(response)
+        //res.send(`El msj fue enviado ${response}`)       
+        res.redirect("/profile")
+    } catch (error) {
+        res.send(error)
+    }   
+    
 
 });
 
@@ -419,45 +455,8 @@ app.get("/productos", (req,res)=>{
     req.body()
 })
 
-//-----------desafio 18 3er entrega proyecto - Add Nodemailer con gmail y Twilio ----------------
-//variables externas
-const TEST_EMAIL = config.TEST_EMAIL; //modificamos credenciales de acceso
-const TEST_PASS = config.TEST_PASS;
-//config nodemailer transporter
-const transporter = createTransport({
-    host: 'smtp.gmail.com', //modificamos el host de gmail
-    port: 587,
-    auth: {
-        user: TEST_EMAIL,
-        pass: TEST_PASS
-    },
-    secure: false, //cuando se use tiene que estar en true
-    tls: {
-        rejectUnauthorized: false //cuando se use tiene que estar en true
-    }
-});
-
-const emailTemplate =`<div>
-<h1>Un nuevo usuario se ha registrado correctamente!</h1>
-</div>`
-
-const mailOptions={
-    from: "Servidor de NodeJS",
-    to: TEST_EMAIL,
-    subject:"Nuevo Registro de Usuario",
-    html: emailTemplate
-}
 
 
-app.post("/signup", async(res,req)=>{
 
-    try{
-        const response = await transporter.sendMail(mailOptions);
-        res.send(`El msj fue enviado ${response}`)       
-        
-    } catch (error) {
-        res.send(error)
-    }   
-})
 
 
