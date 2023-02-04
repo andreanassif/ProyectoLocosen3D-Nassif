@@ -19,6 +19,8 @@ export const config = {
     SQLITE_DB: process.env.SQLITE_DB,
     FILE_DB: process.env.FILE_DB,
     MONGO_AUTENTICATION:process.env.MONGO_AUTENTICATION,
-    MONGO_SESSION:process.env.MONGO_SESSION
+    MONGO_SESSION:process.env.MONGO_SESSION,
+    TEST_EMAIL: process.env.TEST_EMAIL,
+    TEST_PASS: process.env.TEST_PASS
 };
 

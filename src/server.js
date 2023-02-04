@@ -21,13 +21,12 @@ import compression from "compression";
 import {createTransport} from "nodemailer";
 
 
-
 import path from "path";
 import url from "url";
 import { fileURLToPath } from "url";
 import {dirname} from "path";
 import {contenedorMsj} from "./managers/contenedorMsj.js"
-import { UserModel } from './models/user.js';
+import { UserModel} from './models/user.js';
 
 const mensajes = new contenedorMsj(options.fileSystem.pathMensajes)
 
@@ -259,11 +258,15 @@ app.get("/", (req,res)=>{
     res.render("home")
 })
 
-app.get("/signup",(req,res)=>{
+
+
+app.get("/signup", (req,res)=>{
     const errorMessage = req.session.messages ? req.session.messages[0] : '';
     res.render("signup", {error: errorMessage})
     req.session.messages = []
-});
+
+})
+
 
 app.get("/login", (req,res)=>{
     res.render("login")
@@ -307,12 +310,17 @@ app.post("/login",passport.authenticate('loginStrategy',{
     res.redirect("/profile")
 })
 
+
+
 app.post("/signup",passport.authenticate('signupStrategy',{
     failureRedirect:"/signup",
     failureMessage:true //req.session.messages
-}),(req,res)=>{
+}), (req,res)=>{
     res.redirect("/profile")
+
 });
+
+
 
 
 
@@ -400,23 +408,22 @@ app.get("/random", (req,res)=>{
             child.on('message', msg => res.json(msg))
 })
 
-//-------desafio  clase 18 3er entrega vista carrito---------------
+//-------desafio  clase 18 3er entrega vista carrito y productos---------------
 
 app.get("/cart", (req,res)=>{
     res.render("cart")
 })
 
-/* app.get("/productos", (req,res)=>{
+app.get("/productos", (req,res)=>{
     res.render("productos")
     req.body()
 })
- */
 
 //-----------desafio 18 3er entrega proyecto - Add Nodemailer con gmail y Twilio ----------------
 //variables externas
-const TEST_EMAIL = "andrea.e.nassif@gmail.com"; //modificamos credenciales de acceso
-const TEST_PASS = "cgwqpaspswplrgrs";
-//config ethereal 
+const TEST_EMAIL = config.TEST_EMAIL; //modificamos credenciales de acceso
+const TEST_PASS = config.TEST_PASS;
+//config nodemailer transporter
 const transporter = createTransport({
     host: 'smtp.gmail.com', //modificamos el host de gmail
     port: 587,
@@ -430,8 +437,8 @@ const transporter = createTransport({
     }
 });
 
-const emailTemplate = `<div>
-<h1>Un nuevo usuario se ha registrado correctamente</h1>
+const emailTemplate =`<div>
+<h1>Un nuevo usuario se ha registrado correctamente!</h1>
 </div>`
 
 const mailOptions={
@@ -441,11 +448,16 @@ const mailOptions={
     html: emailTemplate
 }
 
-app.post("/signup", async(req,res)=>{
+
+app.post("/signup", async(res,req)=>{
+
     try{
-        const response = await transporter.sendMail(mailOptions)
-        res.send(`El msj fue enviado ${response}`)
+        const response = await transporter.sendMail(mailOptions);
+        res.send(`El msj fue enviado ${response}`)       
+        
     } catch (error) {
         res.send(error)
-    }
+    }   
 })
+
+
